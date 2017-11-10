@@ -17,9 +17,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import oxim.digital.reedly.R;
 import oxim.digital.reedly.base.BaseFragment;
 import oxim.digital.reedly.base.ScopedPresenter;
@@ -35,10 +36,12 @@ public final class UserSubscriptionsFragment extends BaseFragment implements Use
 
     private static final int ADD_FEED = 100;
     private static final int DELETE_FEED = 200;
+    private Unbinder unbinder;
 
     @Retention(SOURCE)
     @IntDef({ADD_FEED, DELETE_FEED})
-    private @interface ViewState { }
+    private @interface ViewState {
+    }
 
     @Inject
     UserSubscriptionsContract.Presenter presenter;
@@ -46,16 +49,16 @@ public final class UserSubscriptionsFragment extends BaseFragment implements Use
     @Inject
     ImageLoader imageLoader;
 
-    @Bind(R.id.user_feeds_recycler_view)
+    @BindView(R.id.user_feeds_recycler_view)
     RecyclerView userFeedsRecyclerView;
 
-    @Bind(R.id.empty_state_view)
+    @BindView(R.id.empty_state_view)
     View emptyStateView;
 
-    @Bind(R.id.add_new_feed_button)
+    @BindView(R.id.add_new_feed_button)
     FloatingActionButton actionButton;
 
-    @Bind(R.id.toggle_notifications_button)
+    @BindView(R.id.toggle_notifications_button)
     ImageView backgroundUpdatesNotification;
 
     private RecyclerView.LayoutManager feedsLayoutManager;
@@ -75,7 +78,7 @@ public final class UserSubscriptionsFragment extends BaseFragment implements Use
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable final Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_user_subscriptions, container, false);
-        ButterKnife.bind(this, fragmentView);
+        unbinder = ButterKnife.bind(this, fragmentView);
         return fragmentView;
     }
 
@@ -93,9 +96,9 @@ public final class UserSubscriptionsFragment extends BaseFragment implements Use
             feedAdapter = (FeedAdapter) userFeedsRecyclerView.getAdapter();
         }
         feedAdapter.onItemClick()
-                   .subscribe(this::onFeedClicked);
+                .subscribe(this::onFeedClicked);
         feedAdapter.onItemLongClick()
-                   .subscribe(this::onFeedSelected);
+                .subscribe(this::onFeedSelected);
         feedsLayoutManager = new LinearLayoutManager(null);             // TODO - inject this, save its state on orientation change
         userFeedsRecyclerView.setLayoutManager(feedsLayoutManager);
     }
@@ -148,7 +151,7 @@ public final class UserSubscriptionsFragment extends BaseFragment implements Use
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        unbinder.unbind();
     }
 
     @Override
